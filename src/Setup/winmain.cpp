@@ -39,7 +39,7 @@ void MitigateDllHijacking()
 
 	SetDefaultDllDirectoriesFunction pfn = (SetDefaultDllDirectoriesFunction)GetProcAddress(hKernel32, "SetDefaultDllDirectories");
 	if (pfn) { (*pfn)(LOAD_LIBRARY_SEARCH_SYSTEM32); }
-
+			
 	PreloadLibs();
 }
 
@@ -55,7 +55,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	if (cmdLine.Find(L"--checkInstall") >= 0) {
 		// If we're already installed, exit as fast as possible
-		if (!MachineInstaller::ShouldSilentInstall()) {
+		if (!MachineInstaller::ShouldSilentInstall()) {	
+			// We'll log this event for users and show a messagebox.
+			mkInstallerLog(L"MechaKeys is already installed on this system.", true);
 			return 0;
 		}
 
@@ -122,4 +124,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 out:
 	_Module->Term();
 	return exitCode;
+}
+
+void mkInstallerLog(const wchar_t*, bool MessageBox)
+{
+
 }
