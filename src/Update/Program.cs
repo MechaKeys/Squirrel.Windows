@@ -296,6 +296,11 @@ namespace Squirrel.Update
             }
         }
 
+        public static void ElectronReleasify(string package, string targetDir = null, string baseUrl = null)
+        {
+
+        }
+
         public void Releasify(string package, string targetDir = null, string packagesDir = null, string bootstrapperExe = null, string backgroundGif = null, string signingOpts = null, string baseUrl = null, string setupIcon = null, bool generateMsi = true, bool packageAs64Bit = false, string frameworkVersion = null, bool generateDeltas = true)
         {
             ensureConsole();
