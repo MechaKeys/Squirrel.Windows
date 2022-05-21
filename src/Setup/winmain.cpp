@@ -157,7 +157,8 @@ void mkInstallerLog(const wchar_t*, bool WithMessageBox)
 		fclose(file);
 	}
 
-	if (WithMessageBox) {
+	if (WithMessageBox) 
+	{
 		//int MessageBox(
 		//	[in, optional] HWND    hWnd,
 		//	[in, optional] LPCTSTR lpText,
