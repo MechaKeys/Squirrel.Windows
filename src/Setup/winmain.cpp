@@ -8,6 +8,9 @@
 #include "MachineInstaller.h"
 #include <cstdio>
 #include <string>
+#include <cstdlib> // This lets us access getenv()
+#include <cstdarg>
+#include <array>
 
 CAppModule* _Module;
 
@@ -56,8 +59,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (cmdLine.Find(L"--checkInstall") >= 0) {
 		// If we're already installed, exit as fast as possible
 		if (!MachineInstaller::ShouldSilentInstall()) {	
-			// We'll log this event for users and show a messagebox.
-			mkInstallerLog(L"MechaKeys is already installed on this system.", true);
+			// We'll log this event for users and show a messagebox. As this isn't an error, I won't use ::DisplayErrorMessage()
+			mkInstallerLog(L"MechaKeys is already installed on this system. Did you mean to uninstall?", true);
 			return 0;
 		}
 
@@ -126,7 +129,46 @@ out:
 	return exitCode;
 }
 
-void mkInstallerLog(const wchar_t*, bool MessageBox)
+void mkInstallerLog(const wchar_t*, bool WithMessageBox)
 {
+	wchar_t buff[2048];
+	// const char* tempDir = getenv("TEMP"); 
+	// Windows has two temp directory env variables. We'll get both but prefer `TEMP` first.
+	// std::array<std::string, 10> tempDirs = {"TEMP", "TMP"};
 
+	//const char* tempDirs[2] = { "TEMP", "TMP" };
+	//for (size_t i = 0; i < tempDirs.size(); ++i)
+
+	const char* tempDir = getenv("TEMP");
+	
+	if (tempDir) 
+	{
+		char path[MAX_PATH];
+		sprintf(path, "%s\\mkInstaller.log", tempDir);
+		FILE* file = fopen(path, "a"); // We'll append any output to the mkInstaller.log file. 
+		// Automatically created if it doens't exist.
+
+		char charBuff[4096];
+		size_t elCount = wcstombs(charBuff, buff, sizeof(charBuff));	
+
+		// Write the character buffer once to the mkInstaller.log file.
+		fwrite(charBuff, 1, elCount, file);
+		
+		fclose(file);
+	}
+
+	if (WithMessageBox) {
+		//int MessageBox(
+		//	[in, optional] HWND    hWnd,
+		//	[in, optional] LPCTSTR lpText,
+		//	[in, optional] LPCTSTR lpCaption,
+		//	[in]           UINT    uType
+		//);
+		MessageBox(
+			NULL,
+			buff,
+			(LPCWSTR)L"MechaKeys Installer",
+			MB_OK
+		);
+	}
 }
